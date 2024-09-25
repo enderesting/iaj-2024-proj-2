@@ -30,6 +30,7 @@ namespace Assets.Scripts.Game.NPCs
             this.stats.SimpleDamage = 6;
             this.stats.AwakeDistance = 15;
             this.stats.WeaponRange = 3;
+            this.stats.BaseState = new Sleep(this); // TODO - maybe this will null out?
         }
 
         public override void InitializeStateMachine()
@@ -37,8 +38,9 @@ namespace Assets.Scripts.Game.NPCs
             GetPatrolPositions(out Vector3 pos1,out Vector3 pos2);
             PatrolRoute.Add(pos1);
             PatrolRoute.Add(pos2);
+            this.stats.BaseState = new Patrol(this,PatrolRoute);
 
-            this.StateMachine = new StateMachine(new Patrol(this,PatrolRoute));
+            this.StateMachine = new StateMachine(this.stats.BaseState);
     
         }
 
