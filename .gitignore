@@ -1,0 +1,26 @@
+.vs
+.vscode
+Assets/3rd Party
+Assets/Materials
+Assets/Resources
+Assets/Scenes
+Assets/Characters
+Assets/Editor
+Assets/External
+Logs
+Packages
+UserSettings
+.vsconfig
+Assembly-CSharp-Editor.csproj
+Assembly-CSharp.csproj
+IAJ-DecisionMaking.sln
+mono_crash.mem.80755.1.blob
+Library/
+ProjectSettings/
+Temp/
+obj/
+Assets/3rd Party.meta
+Assets/Materials.meta
+Assets/Resources.meta
+Assets/Scenes.meta
+Assets/Scripts.meta
