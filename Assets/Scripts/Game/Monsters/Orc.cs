@@ -18,6 +18,7 @@ namespace Assets.Scripts.Game.NPCs
     {
 
         public GameObject AlertSprite;
+        public List<Vector3> PatrolRoute;
 
         public Orc()
         {
@@ -34,8 +35,10 @@ namespace Assets.Scripts.Game.NPCs
         public override void InitializeStateMachine()
         {
             GetPatrolPositions(out Vector3 pos1,out Vector3 pos2);
+            PatrolRoute.Add(pos1);
+            PatrolRoute.Add(pos2);
 
-            this.StateMachine = new StateMachine(new Patrol(this));
+            this.StateMachine = new StateMachine(new Patrol(this,PatrolRoute));
     
         }
 

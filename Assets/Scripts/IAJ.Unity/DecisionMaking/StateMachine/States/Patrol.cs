@@ -8,16 +8,32 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.StateMachine
 {
     class Patrol : IState
     {
+        public float Allowance = 0.5f;
         public Monster Agent { get; set; }
-        public Patrol(Monster agent) { this.Agent = agent; }
+
+        public int CurrentTargetIndex;
+
+        public List<Vector3> PatrolRoute;
+
+        public Patrol(Monster agent, List<Vector3> PatrolRoute) {
+            this.Agent = agent;
+            this.PatrolRoute = PatrolRoute;
+        }
 
         public List<IAction> GetEntryActions() 
         { 
-            Debug.Log(Agent.name + "is starting to Sleep"); 
-            return new List<IAction> { new Stop(Agent) };
+            Debug.Log(Agent.name + "is starting to Patrol"); 
+            return new List<IAction>(); 
         }
 
-        public List<IAction> GetActions() { return new List<IAction>(); }
+        public List<IAction> GetActions() {
+            float dist = Vector3.Distance(Agent.transform.position,PatrolRoute[CurrentTargetIndex]);
+            if (dist < Allowance){ // once reaching a point, move to the next
+                CurrentTargetIndex = (CurrentTargetIndex+1)%PatrolRoute.Count;
+            }
+            // Debug.Log("moving to point:" + CurrentTargetIndex);
+            return new List<IAction>{ new MoveTo(Agent,PatrolRoute[CurrentTargetIndex])};
+        }
 
         public List<IAction> GetExitActions() { return new List<IAction>(); }
 
