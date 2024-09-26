@@ -18,7 +18,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.StateMachine
             this.Target = target;
         }
 
-        public List<IAction> GetEntryActions() { Debug.Log(Agent.name + "is pursuing"); return new List<IAction>(); }
+        public List<IAction> GetEntryActions() {
+            Debug.Log(Agent.name + "is pursuing");
+            return new List<IAction>{
+                new Shout(Agent),
+            };
+            }
 
         public List<IAction> GetActions()
         { return new List<IAction> { new MoveTo(Agent, Target.transform.position)}; }
