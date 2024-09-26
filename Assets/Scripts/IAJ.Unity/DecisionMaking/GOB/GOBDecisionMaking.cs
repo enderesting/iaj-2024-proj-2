@@ -59,7 +59,25 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
             ActionDiscontentment.Clear();
 
             //ToDo implement
+            bestAction = actions[0];
+            bestValue = CalculateDiscontentment(bestAction, goals, character);
 
+            foreach(Action action in actions)
+            {
+                if (action.CanExecute())
+                {
+                    float discontentment = CalculateDiscontentment(action, goals, character);
+                    ActionDiscontentment.Add(action, discontentment);
+
+                    if (discontentment < bestValue)
+                    {
+                        thirdBestAction = secondBestAction;
+                        secondBestAction = bestAction;
+                        bestAction = action;
+                        bestValue = discontentment;
+                    }
+                }
+            }
             
             InProgress = false;
             return bestAction;
