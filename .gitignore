@@ -19,8 +19,4 @@ Library/
 ProjectSettings/
 Temp/
 obj/
-Assets/3rd Party.meta
-Assets/Materials.meta
-Assets/Resources.meta
-Assets/Scenes.meta
-Assets/Scripts.meta
+*.meta
