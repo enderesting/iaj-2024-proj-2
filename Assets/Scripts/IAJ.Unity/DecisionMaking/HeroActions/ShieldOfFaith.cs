@@ -5,6 +5,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.HeroActions
 	public class ShieldOfFaith : Action
 	{
 		public float manaCost = 5.0f;
+		public float hpGain = 5.0f;
 		protected AutonomousCharacter Character { get; set; }
 
 		public ShieldOfFaith(AutonomousCharacter character) : base("ShieldOfFaith")
@@ -14,11 +15,13 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.HeroActions
 		
 		public override float GetGoalChange(Goal goal)
 		{
+			float change = base.GetGoalChange(goal);
+
 			if (goal.Name == AutonomousCharacter.SURVIVE_GOAL)
 			{
-				return goal.InsistenceValue;
+				change -= Character.baseStats.MaxShieldHp - Character.baseStats.ShieldHP;
 			}
-			return 0.0f;
+			return change;
 		}
 		
 		public override bool CanExecute()
