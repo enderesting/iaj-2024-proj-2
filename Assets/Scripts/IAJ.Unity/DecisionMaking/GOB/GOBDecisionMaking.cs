@@ -59,8 +59,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
             ActionDiscontentment.Clear();
 
             //ToDo implement
-            bestAction = actions[0];
-            bestValue = CalculateDiscontentment(bestAction, goals, character);
 
             foreach(Action action in actions)
             {
@@ -78,7 +76,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
                     }
                 }
             }
-            
             InProgress = false;
             return bestAction;
         }
