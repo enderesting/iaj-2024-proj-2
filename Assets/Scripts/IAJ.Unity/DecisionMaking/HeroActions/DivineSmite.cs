@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.HeroActions
 {
-	public class DivineSmite : Action
+	public class DivineSmite : WalkToTargetAndExecuteAction
 	{
 		private float manaCost = 2.0f;
 		private AutonomousCharacter character;
@@ -11,7 +11,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.HeroActions
 		private float xpChange = 3;
 		private float expectedXPChange = 2.7f;
 
-		public DivineSmite(AutonomousCharacter character, GameObject target) : base("DivineSmite")
+		public DivineSmite(AutonomousCharacter character, GameObject target) : base("DivineSmite", character, target)
 		{
 			this.character = character;
 			this.target = target;
@@ -19,12 +19,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.HeroActions
 
 		public override bool CanExecute()
 		{
-			return target is not null && target.activeInHierarchy && target.tag.Equals("Skeleton") &&
-			       GameManager.Instance.InDivineSmiteRange(target) && this.character.baseStats.Mana >= 2;
+			return target != null && target.activeInHierarchy && target.CompareTag("Skeleton") && this.character.baseStats.Mana >= 2;
 		}
 
 		public override void Execute()
 		{
+			base.Execute();
 			GameManager.Instance.DivineSmite(target);
 		}
 
