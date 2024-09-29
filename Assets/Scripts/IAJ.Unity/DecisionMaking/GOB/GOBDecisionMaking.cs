@@ -22,8 +22,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
         {
             this.actions = _actions;
             this.goals = goals;
-            secondBestAction = new Action("yo");
-            thirdBestAction = new Action("yo too");
             this.ActionDiscontentment = new Dictionary<Action,float>();
         }
 
@@ -57,9 +55,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
             secondBestAction = null;
             thirdBestAction = null;
             ActionDiscontentment.Clear();
-
-            //ToDo implement
-
+            
             foreach(Action action in actions)
             {
                 if (action.CanExecute())
