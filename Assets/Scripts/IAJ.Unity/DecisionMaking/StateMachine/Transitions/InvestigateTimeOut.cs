@@ -11,7 +11,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.StateMachine
         private AutonomousCharacter enemy;
         public Monster agent;
 
-        float TimeOutDuration = 5f;
+        float TimeOutDuration = 20f;
         float ElapsedTime;
 
         public InvestigateTimeOut(Monster agent, float ElapsedTime)
