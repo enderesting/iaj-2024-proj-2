@@ -81,9 +81,9 @@ public class AutonomousCharacter : NPC
     public bool LevelUp = true;
     public bool GetHealthPotion = true;
     public bool SwordAttack = true;
-    public bool GetManaPotion = false;
-    public bool ShieldOfFaith = false;
-    public bool DivineSmite = false;
+    public bool GetManaPotion = true;
+    public bool ShieldOfFaith = true;
+    public bool DivineSmite = true;
     public bool Teleport = false;
     public bool LayOnHands = false;
     public bool Rest = false;
@@ -205,7 +205,7 @@ public class AutonomousCharacter : NPC
         {
             if (SwordAttack) { this.Actions.Add(new SwordAttack(this, enemy)); };
 
-            //if (DivineSmite) this.Actions.Add(new DivineSmite(this, enemy));
+            if (DivineSmite) this.Actions.Add(new DivineSmite(this, enemy));
         }
 
         foreach (var enemy in GameObject.FindGameObjectsWithTag("Orc"))
@@ -231,11 +231,11 @@ public class AutonomousCharacter : NPC
 
         foreach (var potion in GameObject.FindGameObjectsWithTag("ManaPotion"))
         {
-            //if (GetManaPotion) this.Actions.Add(new GetManaPotion(this, potion));
+            if (GetManaPotion) this.Actions.Add(new GetManaPotion(this, potion));
         }
 
         //Then we have a series of extra actions available to Sir Uthgard
-        //if (ShieldOfFaith) this.Actions.Add(new ShieldOfFaith(this));
+        if (ShieldOfFaith) this.Actions.Add(new ShieldOfFaith(this));
         if (LevelUp) this.Actions.Add(new LevelUp(this));
         //if (Teleport) this.Actions.Add(new Teleport(this));
         //if (Rest) this.Actions.Add(new Rest(this));
