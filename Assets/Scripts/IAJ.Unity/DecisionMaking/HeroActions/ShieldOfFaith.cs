@@ -33,5 +33,15 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.HeroActions
 		{
 			GameManager.Instance.ShieldOfFaith();
 		}
-	}
+
+        public override void ApplyActionEffects(WorldModel worldModel)
+        {
+            base.ApplyActionEffects(worldModel);
+
+			float mana = (float)worldModel.GetProperty(PropertiesName.MANA);
+
+			worldModel.SetProperty(PropertiesName.MANA, mana - this.manaCost);
+			worldModel.SetProperty(PropertiesName.ShieldHP, this.hpGain);
+        }
+    }
 }

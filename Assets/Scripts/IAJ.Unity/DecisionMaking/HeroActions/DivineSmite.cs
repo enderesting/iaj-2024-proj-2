@@ -39,5 +39,18 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.HeroActions
 
 			return change;
 		}
-	}
+
+        public override void ApplyActionEffects(WorldModel worldModel)
+        {
+            base.ApplyActionEffects(worldModel);
+
+			int xp = (int)worldModel.GetProperty(PropertiesName.XP);
+			float mana = (float)worldModel.GetProperty(PropertiesName.MANA);
+			
+			worldModel.SetProperty(this.Target.name, false);
+            worldModel.SetProperty(PropertiesName.XP, xp + this.xpChange);
+			worldModel.SetProperty(PropertiesName.MANA, mana - this.manaCost);
+
+        }
+    }
 }
