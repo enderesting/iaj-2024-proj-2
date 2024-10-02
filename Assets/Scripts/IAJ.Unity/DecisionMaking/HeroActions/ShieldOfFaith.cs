@@ -4,8 +4,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.HeroActions
 {
 	public class ShieldOfFaith : Action
 	{
-		public float manaCost = 5.0f;
-		public float hpGain = 5.0f;
+		public int manaCost = 5;
+		public int hpGain = 5;
 		protected AutonomousCharacter Character { get; set; }
 
 		public ShieldOfFaith(AutonomousCharacter character) : base("ShieldOfFaith")
@@ -38,7 +38,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.HeroActions
         {
             base.ApplyActionEffects(worldModel);
 
-			float mana = (float)worldModel.GetProperty(PropertiesName.MANA);
+			int mana = (int)worldModel.GetProperty(PropertiesName.MANA);
 
 			worldModel.SetProperty(PropertiesName.MANA, mana - this.manaCost);
 			worldModel.SetProperty(PropertiesName.ShieldHP, this.hpGain);
