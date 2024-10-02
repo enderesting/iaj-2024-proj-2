@@ -55,13 +55,13 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
 
             while (this.CurrentDepth >= 0)
             {
-                if (actionCombinationsProcessedThisFrame >= this.ActionCombinationsProcessedPerFrame)
-                {
-                    break;
-                }
-
                 if (CurrentDepth >= MAX_DEPTH)
                 {
+                    if (actionCombinationsProcessedThisFrame >= this.ActionCombinationsProcessedPerFrame)
+                    {
+                        this.TotalProcessingTime += Time.realtimeSinceStartup - startTime;
+                        return null;
+                    }
                     currentDiscontentment = this.Models[CurrentDepth].Character.CalculateDiscontentment(this.Models[CurrentDepth]);
                     if (currentDiscontentment < BestDiscontentmentValue)
                     {
@@ -90,15 +90,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
                 {
                     CurrentDepth--;
                 }
-            }
-
-            if (this.CurrentDepth < 0)
-            {
-                this.InProgress = false;
-            } 
-            else
-            {
-                actionCombinationsProcessedThisFrame = 0;
             }
 
             this.TotalProcessingTime += Time.realtimeSinceStartup - startTime;
