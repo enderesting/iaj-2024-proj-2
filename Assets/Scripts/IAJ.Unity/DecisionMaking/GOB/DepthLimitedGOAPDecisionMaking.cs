@@ -47,12 +47,58 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
 
         public Action ChooseAction()
         {
-            var processedActions = 0;
             var startTime = Time.realtimeSinceStartup;
+            int actionCombinationsProcessedThisFrame = 0;
+
+            float currentDiscontentment;
+            Action nextAction;
 
             while (this.CurrentDepth >= 0)
             {
-                //ToDo Implement
+                if (actionCombinationsProcessedThisFrame >= this.ActionCombinationsProcessedPerFrame)
+                {
+                    break;
+                }
+
+                if (CurrentDepth >= MAX_DEPTH)
+                {
+                    currentDiscontentment = this.Models[CurrentDepth].Character.CalculateDiscontentment(this.Models[CurrentDepth]);
+                    if (currentDiscontentment < BestDiscontentmentValue)
+                    {
+                        BestDiscontentmentValue = currentDiscontentment;
+                        BestAction = this.LevelAction[0];
+                        for (int i = 0; i < MAX_DEPTH; i++)
+                        {
+                            this.BestActionSequence[i] = this.LevelAction[i];
+                        }
+                    }
+                    actionCombinationsProcessedThisFrame++;
+                    TotalActionCombinationsProcessed++;
+                    CurrentDepth--;
+                    continue;
+                }
+                nextAction = this.Models[CurrentDepth].GetNextAction();
+                if (nextAction != null)
+                {
+                    this.Models[CurrentDepth + 1] = this.Models[CurrentDepth].GenerateChildWorldModel();
+                    nextAction.ApplyActionEffects(this.Models[CurrentDepth + 1]);
+                    this.Models[CurrentDepth + 1].Character.UpdateGoalsInsistence(this.Models[CurrentDepth + 1]);
+                    this.LevelAction[CurrentDepth] = nextAction;
+                    CurrentDepth++;
+                }
+                else
+                {
+                    CurrentDepth--;
+                }
+            }
+
+            if (this.CurrentDepth < 0)
+            {
+                this.InProgress = false;
+            } 
+            else
+            {
+                actionCombinationsProcessedThisFrame = 0;
             }
 
             this.TotalProcessingTime += Time.realtimeSinceStartup - startTime;
