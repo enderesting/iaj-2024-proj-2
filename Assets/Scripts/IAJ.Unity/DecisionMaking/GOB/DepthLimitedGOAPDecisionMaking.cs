@@ -8,7 +8,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
 {
     public class DepthLimitedGOAPDecisionMaking
     {
-        public const int MAX_DEPTH = 3;
+        public const int MAX_DEPTH = 2;
         public int ActionCombinationsProcessedPerFrame { get; set; }
         public float TotalProcessingTime { get; set; }
         public int TotalActionCombinationsProcessed { get; set; }
@@ -80,15 +80,23 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
                 nextAction = this.Models[CurrentDepth].GetNextAction();
                 if (nextAction != null)
                 {
-                    this.Models[CurrentDepth + 1] = this.Models[CurrentDepth].GenerateChildWorldModel();
-                    nextAction.ApplyActionEffects(this.Models[CurrentDepth + 1]);
-                    this.Models[CurrentDepth + 1].Character.UpdateGoalsInsistence(this.Models[CurrentDepth + 1]);
-                    this.LevelAction[CurrentDepth] = nextAction;
-                    CurrentDepth++;
+                    WorldModel nextWM = this.Models[CurrentDepth].GenerateChildWorldModel();
+                    nextAction.ApplyActionEffects(nextWM);
+                    if (nextWM.IsAlive()){
+                        Debug.Log("action found. can be executed...");
+                        nextWM.Character.UpdateGoalsInsistence(nextWM);
+                        this.Models[CurrentDepth + 1] = nextWM;
+                        this.LevelAction[CurrentDepth] = nextAction;
+                        CurrentDepth++;
+                    }
+                    else{
+                        continue;
+                    }
                 }
                 else
                 {
                     CurrentDepth--;
+                    Debug.Log("decrease depth");
                 }
             }
 

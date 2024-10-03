@@ -101,5 +101,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel
                 return this.NextEnemyActions;
         }
 
+        public virtual bool IsAlive(){
+            return (int)this.GetProperty(PropertiesName.HP) > 0;
+        }
+
     }
 }
