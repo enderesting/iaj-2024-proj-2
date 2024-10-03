@@ -22,6 +22,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.HeroActions
 			return target != null && target.activeInHierarchy && target.CompareTag("Skeleton") && this.character.baseStats.Mana >= 2;
 		}
 
+		public override bool CanExecute(WorldModel worldModel){
+			
+			return target != null && target.activeInHierarchy && target.CompareTag("Skeleton")
+					 && (int)worldModel.GetProperty(PropertiesName.MANA) >= manaCost;
+		}
+
 		public override void Execute()
 		{
 			base.Execute();

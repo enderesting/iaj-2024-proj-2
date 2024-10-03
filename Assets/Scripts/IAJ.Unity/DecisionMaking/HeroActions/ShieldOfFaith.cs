@@ -1,4 +1,5 @@
 using Assets.Scripts.IAJ.Unity.DecisionMaking.ForwardModel;
+using UnityEngine;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.HeroActions
 {
@@ -26,7 +27,13 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.HeroActions
 		
 		public override bool CanExecute()
 		{
-			return Character.baseStats.Mana >= manaCost;
+			bool res = Character.baseStats.Mana >= manaCost;
+			// Debug.Log("ShieldOfFaith:" +  Character.baseStats.Mana + " mana cost:" + manaCost + " res:" + res);
+			return res;
+		}
+
+		public override bool CanExecute(WorldModel worldModel){
+			return (int)worldModel.GetProperty(PropertiesName.MANA) >= manaCost;
 		}
 
 		public override void Execute()
