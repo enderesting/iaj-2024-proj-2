@@ -38,6 +38,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.HeroActions
             {
                 change -= goal.InsistenceValue;
             }
+            if (goal.Name == AutonomousCharacter.GAIN_LEVEL_GOAL)
+            {
+                change -= goal.InsistenceValue;
+            }
  
             return change;
         }
