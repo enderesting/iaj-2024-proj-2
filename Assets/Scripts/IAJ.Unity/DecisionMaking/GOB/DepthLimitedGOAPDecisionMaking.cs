@@ -8,7 +8,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
 {
     public class DepthLimitedGOAPDecisionMaking
     {
-        public const int MAX_DEPTH = 3;
+        public const int MAX_DEPTH = 2;
         public int ActionCombinationsProcessedPerFrame { get; set; }
         public float TotalProcessingTime { get; set; }
         public int TotalActionCombinationsProcessed { get; set; }
@@ -47,12 +47,57 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
 
         public Action ChooseAction()
         {
-            var processedActions = 0;
             var startTime = Time.realtimeSinceStartup;
+            int actionCombinationsProcessedThisFrame = 0;
+
+            float currentDiscontentment;
+            Action nextAction;
 
             while (this.CurrentDepth >= 0)
             {
-                //ToDo Implement
+                if (CurrentDepth >= MAX_DEPTH)
+                {
+                    if (actionCombinationsProcessedThisFrame >= this.ActionCombinationsProcessedPerFrame)
+                    {
+                        this.TotalProcessingTime += Time.realtimeSinceStartup - startTime;
+                        return null;
+                    }
+                    currentDiscontentment = this.Models[CurrentDepth].Character.CalculateDiscontentment(this.Models[CurrentDepth]);
+                    if (currentDiscontentment < BestDiscontentmentValue)
+                    {
+                        BestDiscontentmentValue = currentDiscontentment;
+                        BestAction = this.LevelAction[0];
+                        for (int i = 0; i < MAX_DEPTH; i++)
+                        {
+                            this.BestActionSequence[i] = this.LevelAction[i];
+                        }
+                    }
+                    actionCombinationsProcessedThisFrame++;
+                    TotalActionCombinationsProcessed++;
+                    CurrentDepth--;
+                    continue;
+                }
+                nextAction = this.Models[CurrentDepth].GetNextAction();
+                if (nextAction != null)
+                {
+                    WorldModel nextWM = this.Models[CurrentDepth].GenerateChildWorldModel();
+                    nextAction.ApplyActionEffects(nextWM);
+                    if (nextWM.IsAlive()){
+                        Debug.Log("action found. can be executed...");
+                        nextWM.Character.UpdateGoalsInsistence(nextWM);
+                        this.Models[CurrentDepth + 1] = nextWM;
+                        this.LevelAction[CurrentDepth] = nextAction;
+                        CurrentDepth++;
+                    }
+                    else{
+                        continue;
+                    }
+                }
+                else
+                {
+                    CurrentDepth--;
+                    Debug.Log("decrease depth");
+                }
             }
 
             this.TotalProcessingTime += Time.realtimeSinceStartup - startTime;
