@@ -564,7 +564,7 @@ public class AutonomousCharacter : NPC
     }
 
     // You'll need this, when using MCTS
-    /*private void UpdateMCTS(MCTS mCTS)
+    private void UpdateMCTS(MCTS mCTS)
     {
         if (mCTS.InProgress)
         {
@@ -622,7 +622,7 @@ public class AutonomousCharacter : NPC
         }
 
 
-    }*/
+    }
 
 
 

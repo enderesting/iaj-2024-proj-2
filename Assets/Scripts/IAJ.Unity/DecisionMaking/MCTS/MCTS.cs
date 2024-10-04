@@ -77,52 +77,81 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
             var startTime = Time.realtimeSinceStartup;
 
-            //while within computational budget
+            while ((this.MaxIterations <= 0) || this.CurrentIterations < this.MaxIterations)
+            {
+                // Selection (& Expansions)
+                selectedNode = Selection(this.InitialNode);
 
-            //Selection + Expansion
+                // Playout
+                reward = Playout(selectedNode.State);
 
-            //Playout
-
-            //Backpropagation
+                // Backpropagation
+                Backpropagate(selectedNode, reward);
+                this.CurrentIterations++;
+            }
 
             // return best initial child
-            return null;
+            return BestFirstChild?.Action;
         }
 
-        // Selection and Expantion
+        // Selection and Expansion
         protected MCTSNode Selection(MCTSNode initialNode)
         {
             Action nextAction;
             MCTSNode currentNode = initialNode;
             MCTSNode bestChild;
 
-            //   while(!currentNode.State.IsTerminal())
+            while (!currentNode.State.IsTerminal())
+            {
+                // not fully explored
+                if ((nextAction = currentNode.State.GetNextAction()) is not null)
+                {
+                    return Expand(currentNode, nextAction);
+                }
 
-            // nextAction = currentNode.State.GetNextAction();
-
-            //Expansion
+                return BestChild(currentNode);
+            }
 
             return null;
         }
 
         protected virtual float Playout(WorldModel initialStateForPlayout)
         {
+            WorldModel currentState = initialStateForPlayout;
             Action[] executableActions;
+            float reward = 0;
 
-            //ToDo
-            return 0.0f;
+            while (!currentState.IsTerminal() && ((this.PlayoutDepthLimit <= 0) || this.NumberPlayouts <= this.PlayoutDepthLimit))
+            {
+                WorldModel newState = currentState.GenerateChildWorldModel();
+                
+                executableActions = newState.GetExecutableActions();
+                
+                Action selectedAction = executableActions[this.RandomGenerator.Next(0, executableActions.Length)];
+                
+                selectedAction.Execute();
+                
+                currentState = newState;
+                this.NumberPlayouts++;
+            }
+            return reward;
         }
 
         protected virtual void Backpropagate(MCTSNode node, float reward)
         {
-            //ToDo, do not forget to later consider two advesary moves...
+            // TODO
         }
 
         protected MCTSNode Expand(MCTSNode parent, Action action)
         {
             WorldModel newState = parent.State.GenerateChildWorldModel();
-            //ToDo
-            return null;
+            
+            action.Execute();
+
+            MCTSNode newNode = new MCTSNode(newState);
+            newNode.Action = action;
+            
+            return newNode;
         }
 
         protected virtual MCTSNode BestUCTChild(MCTSNode node)
@@ -135,8 +164,18 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         //the exploration factor
         protected MCTSNode BestChild(MCTSNode node)
         {
-            //ToDo
-            return null;
+            float bestRatio = float.MinValue;
+            MCTSNode bestNode = null;
+            foreach (MCTSNode childNode in node.ChildNodes)
+            {
+                if (childNode.Q / childNode.N > bestRatio)
+                {
+                    bestRatio = childNode.Q / childNode.N;
+                    bestNode = childNode;
+                }
+            }
+
+            return bestNode;
         }
 
 
