@@ -84,8 +84,8 @@ public class AutonomousCharacter : NPC
     public bool GetManaPotion = true;
     public bool ShieldOfFaith = true;
     public bool DivineSmite = true;
-    public bool Teleport = false;
-    public bool LayOnHands = false;
+    public bool Teleport = true;
+    public bool LayOnHands = true;
     public bool Rest = false;
 
 
