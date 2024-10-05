@@ -106,9 +106,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 // not fully explored
                 if ((nextAction = currentNode.State.GetNextAction()) is not null)
                 {
+                    // expand the next action in the node's list
                     return Expand(currentNode, nextAction);
                 }
 
+                // if it is fully explored, return best children
                 return BestChild(currentNode);
             }
 
@@ -129,28 +131,32 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 
                 Action selectedAction = executableActions[this.RandomGenerator.Next(0, executableActions.Length)];
                 
-                selectedAction.Execute();
+                selectedAction.ApplyActionEffects(newState);
                 
                 currentState = newState;
                 this.NumberPlayouts++;
+                reward += selectedAction.GetHValue(currentState);
             }
             return reward;
         }
 
         protected virtual void Backpropagate(MCTSNode node, float reward)
         {
-            // TODO
+            
+            
         }
 
+        // given a parent node and action, apply the action and adds a new node to the tree
         protected MCTSNode Expand(MCTSNode parent, Action action)
         {
             WorldModel newState = parent.State.GenerateChildWorldModel();
             
-            action.Execute();
+            action.ApplyActionEffects(newState); //apply action to wm like this
 
             MCTSNode newNode = new MCTSNode(newState);
             newNode.Action = action;
-            
+            newNode.Parent = parent;
+            parent.ChildNodes.Add(newNode);
             return newNode;
         }
 
