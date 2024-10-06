@@ -22,7 +22,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.State = state;
             this.ChildNodes = new List<MCTSNode>();
             this.N = 0;
-            this.Q = 0f;
+            this.Q = float.MaxValue;
         }
     }
 }

@@ -91,7 +91,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             }
 
             // return best initial child
-            return BestFirstChild?.Action;
+            return BestAction(this.InitialNode);
         }
 
         // Selection and Expansion
@@ -104,15 +104,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             MCTSNode currentNode = initialNode;
             MCTSNode bestChild;
             // if it isn't leaf node...
-            while (currentNode.ChildNodes.Count()>0){
+            while (currentNode.ChildNodes.Count() > 0){
                 // recursively choose child with best UCT value until leaf node is reached
                 bestChild = BestUCTChild(currentNode);
                 currentNode = bestChild;
             }
-
-            // if currentnode hasnt ever been visited, roll out currentnode
-            if (currentNode.N == 0)
-                return currentNode;
 
             // otherwise, expand current node -- add new node for every available action
             while ((nextAction = currentNode.State.GetNextAction()) is not null)
@@ -120,7 +116,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 // expand the next action in a new node and add to the node's list
                 return Expand(currentNode, nextAction);
             }
-            return currentNode.ChildNodes[0];
+            return currentNode;
         }
 
         protected virtual float Playout(WorldModel initialStateForPlayout)
