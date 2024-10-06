@@ -95,26 +95,33 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         }
 
         // Selection and Expansion
+        // edit: based on https://youtu.be/UXW2yZndl7U about 1:10 in
         protected MCTSNode Selection(MCTSNode initialNode)
         {
+            // selecting from existing tree the best node based on an equation
+            // expand: whichever best node it lands on, find an unexplored action and explore the node
             Action nextAction;
             MCTSNode currentNode = initialNode;
             MCTSNode bestChild;
 
-            while (!currentNode.State.IsTerminal())
-            {
-                // not fully explored
-                if ((nextAction = currentNode.State.GetNextAction()) is not null)
-                {
-                    // expand the next action in the node's list
-                    return Expand(currentNode, nextAction);
-                }
-
-                // if it is fully explored, return best children
-                return BestChild(currentNode);
+            // if it isn't leaf node...
+            while (currentNode.ChildNodes.Count()>0){
+                // recursively choose child with best UCT value until leaf node is reached
+                bestChild = BestUCTChild(currentNode);
+                currentNode = bestChild;
             }
 
-            return null;
+            // if currentnode hasnt ever been visited, roll out currentnode
+            if (currentNode.N == 0)
+                return currentNode;
+
+            // otherwise, expand current node -- add new node for every available action
+            while ((nextAction = currentNode.State.GetNextAction()) is not null)
+            {
+                // expand the next action in a new node and add to the node's list
+                return Expand(currentNode, nextAction);
+            }
+            return currentNode.ChildNodes[0];
         }
 
         protected virtual float Playout(WorldModel initialStateForPlayout)
@@ -142,8 +149,14 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         protected virtual void Backpropagate(MCTSNode node, float reward)
         {
-            
-            
+            node.Q = reward;
+            node.N = 1;
+            MCTSNode currentNode = node;
+            while (node.Parent != null){
+                currentNode.Parent.Q += reward;
+                currentNode.Parent.N += 1;
+                currentNode = currentNode.Parent;
+            }
         }
 
         // given a parent node and action, apply the action and adds a new node to the tree
@@ -162,8 +175,24 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         protected virtual MCTSNode BestUCTChild(MCTSNode node)
         {
-            //ToDo
-            return null;
+            MCTSNode bestChild = null;
+            double bestUCT = float.MinValue;
+            double childUCT;
+            foreach (MCTSNode childNode in node.ChildNodes){
+                //calculate best UCT score
+                if (childNode.N == 0)
+                    //childUCT = float.PositiveInfinity;
+                    return childNode; // an unvisited node's UCT is +infinity
+                else
+                    childUCT = (childNode.Q/childNode.N) + C * Math.Sqrt(Math.Log(node.N)/childNode.N);
+
+                //compare with best
+                if (childUCT > bestUCT){
+                    bestChild = childNode;
+                    bestUCT = childUCT;
+                }
+            }
+            return bestChild;
         }
 
         //this method is very similar to the bestUCTChild, but it is used to return the final action of the MCTS search, and so we do not care about
