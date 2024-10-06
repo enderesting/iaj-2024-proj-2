@@ -103,7 +103,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             Action nextAction;
             MCTSNode currentNode = initialNode;
             MCTSNode bestChild;
-
             // if it isn't leaf node...
             while (currentNode.ChildNodes.Count()>0){
                 // recursively choose child with best UCT value until leaf node is reached
@@ -129,8 +128,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             WorldModel currentState = initialStateForPlayout;
             Action[] executableActions;
             float reward = 0;
-
-            while (!currentState.IsTerminal() && ((this.PlayoutDepthLimit <= 0) || this.NumberPlayouts <= this.PlayoutDepthLimit))
+            int playoutDepth = 0;
+            while (!currentState.IsTerminal() && ((this.PlayoutDepthLimit <= 0) || playoutDepth <= this.PlayoutDepthLimit))
             {
                 WorldModel newState = currentState.GenerateChildWorldModel();
                 
@@ -141,7 +140,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 selectedAction.ApplyActionEffects(newState);
                 
                 currentState = newState;
-                this.NumberPlayouts++;
+                playoutDepth++;
                 reward += selectedAction.GetHValue(currentState);
             }
             return reward;
@@ -152,7 +151,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             node.Q = reward;
             node.N = 1;
             MCTSNode currentNode = node;
-            while (node.Parent != null){
+            while (currentNode.Parent != null){
                 currentNode.Parent.Q += reward;
                 currentNode.Parent.N += 1;
                 currentNode = currentNode.Parent;
