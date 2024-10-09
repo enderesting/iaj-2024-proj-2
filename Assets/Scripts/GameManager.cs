@@ -95,9 +95,27 @@ public class GameManager : MonoBehaviour
         this.GameEnd = GameObject.Find("EndGame");
         this.GameEnd.GetComponent<RectTransform>().localScale *= 10;
         this.GameEnd.SetActive(false);
-
-
         this.initialPosition = this.Character.gameObject.transform.position;
+        List<Monster> orcs = new()
+        {
+            this.disposableObjects["Orc5"][0].GetComponent<Monster>(),
+            this.disposableObjects["Orc4"][0].GetComponent<Monster>(),
+            this.disposableObjects["Orc3"][0].GetComponent<Monster>(),
+        };
+        if (formationSettings == FormationSettings.LineFormation)
+        {
+            this.Formations = new List<FormationManager>
+            {
+                new(orcs, new LineFormation(), Vector3.zero, Vector3.zero) 
+            };
+        }
+        /* else if (formationSettings == FormationSettings.TriangleFormation)
+        {
+            this.Formations = new List<FormationManager>
+            {
+                new(orcs, new TriangleFormation(), new Vector3(0,0,0), new Vector3(0,0,0)) 
+            };
+        } */
     }
 
     public void UpdateDisposableObjects()
@@ -283,7 +301,8 @@ public class GameManager : MonoBehaviour
                     if (attackRoll >= monster.stats.AC)
                     {
                         //there was an hit, enemy is destroyed, gain xp
-                        RemoveOrcFromFormation(monster);
+                        if (enemy.CompareTag("Orc")) 
+                            RemoveOrcFromFormation(monster);
                         this.enemies.Remove(enemy);
                         this.disposableObjects.Remove(enemy.name);
                         enemy.SetActive(false);
@@ -291,8 +310,9 @@ public class GameManager : MonoBehaviour
                 }
                 else
                 {
+                    if (enemy.CompareTag("Orc"))
+                        RemoveOrcFromFormation(monster);
                     damage = monster.stats.SimpleDamage;
-                    RemoveOrcFromFormation(monster);
                     this.enemies.Remove(enemy);
                     this.disposableObjects.Remove(enemy.name);
                     enemy.SetActive(false);

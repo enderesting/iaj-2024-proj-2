@@ -24,6 +24,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.StateMachine
             {
                 return new List<IAction>{
                 new Shout(Agent),
+                new BreakFormation(Agent)
             };
             }
             else

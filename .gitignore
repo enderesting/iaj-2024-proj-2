@@ -2,8 +2,12 @@
 .vscode
 Assets/3rd Party
 Assets/Materials
-Assets/Resources
-Assets/Scenes
+Assets/Resources/dungeonGrid.txt
+Assets/Resources/orc_shout_audio.ogg
+Assets/Resources/Character.prefab
+Assets/Resources/Wall.prefab
+Assets/Resources/ExclamationMark.prefab
+Assets/Resources/iaj.jpg
 Assets/Characters
 Assets/External
 Logs
