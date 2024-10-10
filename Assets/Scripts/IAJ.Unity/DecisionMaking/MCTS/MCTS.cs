@@ -76,11 +76,22 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             float reward;
 
             var startTime = Time.realtimeSinceStartup;
+            FrameCurrentIterations = 0;
 
             while (this.CurrentIterations < this.MaxIterations)
             {
+                if (FrameCurrentIterations >= this.MaxIterationsPerFrame)
+                {
+                    this.TotalProcessingTime += Time.realtimeSinceStartup - startTime;
+                    return null;    
+                }
+
+                int maxSelectionDepth = 0;
                 // Selection (& Expansions)
-                selectedNode = Selection(this.InitialNode);
+                selectedNode = Selection(this.InitialNode, ref maxSelectionDepth);
+                
+                if (maxSelectionDepth > this.MaxSelectionDepthReached)
+                    this.MaxSelectionDepthReached = maxSelectionDepth;
 
                 // Playout
                 reward = Playout(selectedNode.State);
@@ -88,16 +99,19 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 // Backpropagation
                 Backpropagate(selectedNode, reward);
                 this.CurrentIterations++;
+                this.FrameCurrentIterations++;
             }
 
             // return best initial child
             this.InProgress = false;
-            return BestAction(this.InitialNode);
+            Action bestAction = BestAction(this.InitialNode);
+            this.TotalProcessingTime += Time.realtimeSinceStartup - startTime;
+            return bestAction;
         }
 
         // Selection and Expansion
         // edit: based on https://youtu.be/UXW2yZndl7U about 1:10 in
-        protected MCTSNode Selection(MCTSNode initialNode)
+        protected MCTSNode Selection(MCTSNode initialNode, ref int maxSelectionDepth)
         {
             // selecting from existing tree the best node based on an equation
             // expand: whichever best node it lands on, find an unexplored action and explore the node
@@ -106,6 +120,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
             while (!currentNode.State.IsTerminal())
             {
+                maxSelectionDepth++;
                 // not fully explored
                 if ((nextAction = currentNode.State.GetNextAction()) is not null)
                 {
@@ -138,8 +153,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 playoutDepth++;
                 // Debug.Log("action chosen:" + selectedAction);
             }
+
+            if (playoutDepth > this.MaxPlayoutDepthReached)
+                this.MaxPlayoutDepthReached = playoutDepth;
+
             reward = currentState.GetScore();
-            return reward;
+            return currentState.GetScore();
         }
 
         protected virtual void Backpropagate(MCTSNode node, float reward)
