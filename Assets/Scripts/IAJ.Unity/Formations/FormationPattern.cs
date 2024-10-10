@@ -8,7 +8,7 @@ namespace Assets.Scripts.IAJ.Unity.Formations
         public bool FreeAnchor;
         public abstract Vector3 GetOrientation(FormationManager formation);
 
-        public abstract Vector3 GetSlotLocation(FormationManager formation, int slotNumber);
+        public abstract Vector3 GetSlotLocation(FormationManager formation, int slotNumber, Vector3 centerMass);
 
         public abstract bool SupportSlot(int slotCount);
     }

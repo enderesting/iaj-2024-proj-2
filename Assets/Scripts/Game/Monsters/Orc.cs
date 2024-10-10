@@ -38,7 +38,15 @@ namespace Assets.Scripts.Game.NPCs
             GetPatrolPositions(out Vector3 pos1,out Vector3 pos2);
             PatrolRoute.Add(pos1);
             PatrolRoute.Add(pos2);
-            this.stats.BaseState = new Patrol(this,PatrolRoute);
+
+            if (usingFormation && !formationLeader)
+            {
+                this.stats.BaseState = new Formation(this);
+            }
+            else
+            {
+                this.stats.BaseState = new Patrol(this,PatrolRoute);
+            }
 
             this.StateMachine = new StateMachine(this.stats.BaseState);
     

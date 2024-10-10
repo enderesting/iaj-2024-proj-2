@@ -7,36 +7,24 @@ using UnityEngine.Events;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.StateMachine
 {
-    class Patrol : IState
+    class Formation : IState
     {
-        public float Allowance = 0.5f;
         public Monster Agent { get; set; }
 
-        public int CurrentTargetIndex;
-
-        public List<Vector3> PatrolRoute;
         public Vector3 InvestigateGoal;
 
-        public Patrol(Monster agent, List<Vector3> PatrolRoute) {
+        public Formation(Monster agent) {
             this.Agent = agent;
-            this.PatrolRoute = PatrolRoute;
             Shout.OnShout += ShoutResponse;
         }
 
         public List<IAction> GetEntryActions() 
         { 
-            Debug.Log(Agent.name + "is starting to Patrol"); 
+            Debug.Log(Agent.name + "is starting a Formation"); 
             return new List<IAction>(); 
         }
 
-        public List<IAction> GetActions() {
-            float dist = Vector3.Distance(Agent.transform.position,PatrolRoute[CurrentTargetIndex]);
-            if (dist < Allowance){ // once reaching a point, move to the next
-                CurrentTargetIndex = (CurrentTargetIndex+1)%PatrolRoute.Count;
-            }
-            // Debug.Log("moving to point:" + CurrentTargetIndex);
-            return new List<IAction>{ new MoveTo(Agent,PatrolRoute[CurrentTargetIndex])};
-        }
+        public List<IAction> GetActions() { return new List<IAction>(); }
 
         public List<IAction> GetExitActions() {
             this.InvestigateGoal = Vector3.zero;

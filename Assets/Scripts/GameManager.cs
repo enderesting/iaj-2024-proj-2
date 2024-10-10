@@ -109,13 +109,14 @@ public class GameManager : MonoBehaviour
                 new(orcs, new LineFormation(), Vector3.zero, Vector3.zero) 
             };
         }
-        /* else if (formationSettings == FormationSettings.TriangleFormation)
+        else if (formationSettings == FormationSettings.TriangleFormation)
         {
+            orcs.Insert(0, GameObject.Find("Anchor Point").GetComponent<Monster>());
             this.Formations = new List<FormationManager>
             {
-                new(orcs, new TriangleFormation(), new Vector3(0,0,0), new Vector3(0,0,0)) 
+                new(orcs, new TriangleFormation(), Vector3.zero, Vector3.zero) 
             };
-        } */
+        }
     }
 
     public void UpdateDisposableObjects()

@@ -33,7 +33,7 @@ namespace Assets.Scripts.IAJ.Unity.Formations
             //return new Vector3(rotation.x,rotation.y,rotation.z);
         }
 
-        public override Vector3 GetSlotLocation(FormationManager formation, int slotNumber) => slotNumber switch
+        public override Vector3 GetSlotLocation(FormationManager formation, int slotNumber, Vector3 centerMass) => slotNumber switch
         {
             0 => formation.AnchorPosition,
             _ => formation.AnchorPosition + offset * slotNumber * this.GetOrientation(formation)

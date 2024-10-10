@@ -5,6 +5,7 @@ using Assets.Scripts.Game.NPCs;
 using System.Collections.Generic;
 using UnityEngine.AI;
 using System.Linq;
+using Assets.Scripts.IAJ.Unity.DecisionMaking.StateMachine;
 
 namespace Assets.Scripts.IAJ.Unity.Formations
 {
@@ -33,7 +34,7 @@ namespace Assets.Scripts.IAJ.Unity.Formations
             foreach (Monster npc in Monsters)
             {
                 npc.usingFormation = true;
-                npc.FormationManager = this; 
+                npc.FormationManager = this;
                 SlotAssignment[npc] = i;
                 i++;
                 if (SlotAssignment[npc] == 0) {
@@ -93,21 +94,27 @@ namespace Assets.Scripts.IAJ.Unity.Formations
 
         public void UpdateSlots()
         {
-            var anchor = Pattern.FreeAnchor ?  AnchorPosition : SlotAssignment.FirstOrDefault(pair => pair.Value == 0).Key.transform.position;
+            var anchor = SlotAssignment.FirstOrDefault(pair => pair.Value == 0).Key.transform.position;
             AnchorPosition = anchor;
-            Orientation = Pattern.FreeAnchor ?  AnchorPosition : SlotAssignment.FirstOrDefault(pair => pair.Value == 0).Key.transform.forward;
+            Orientation = SlotAssignment.FirstOrDefault(pair => pair.Value == 0).Key.transform.forward;
 
 
             var orientationMatrix = Orientation;
             Debug.DrawRay(anchor, orientationMatrix);
 
-
+            Vector3 centerMass = Vector3.zero;
+            foreach (var npc in SlotAssignment.Keys.Skip(1))
+            {
+                centerMass += npc.transform.position;
+            }
+            centerMass /= SlotAssignment.Count - 1;
+            
             foreach (var npc in SlotAssignment.Keys)
             {
                 if (SlotAssignment[npc] > 0 || Pattern.FreeAnchor)
                 {
                     int slotNumber = SlotAssignment[npc];
-                    var slot = Pattern.GetSlotLocation(this, slotNumber);
+                    var slot = Pattern.GetSlotLocation(this, slotNumber, centerMass);
 
                     var locationPosition = anchor + orientationMatrix * slotNumber;
                     var locationOrientation = orientationMatrix + slot;
