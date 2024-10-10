@@ -316,8 +316,7 @@ public class AutonomousCharacter : NPC
             }
             else if (MCTSActive)
             {
-                throw new Exception("MCTS Needs to be initialized...");
-                //this.MCTSDecisionMaking.InitializeMCTSearch();
+                this.MCTSDecisionMaking.InitializeMCTSearch();
             }
             //else if ()
             {
@@ -359,6 +358,10 @@ public class AutonomousCharacter : NPC
         else if (this.GOBActive)
         {
             this.UpdateGOB();
+        }
+        else if (this.MCTSActive)
+        {
+            this.UpdateMCTS();
         }
  
 
@@ -564,11 +567,11 @@ public class AutonomousCharacter : NPC
     }
 
     // You'll need this, when using MCTS
-    /*private void UpdateMCTS(MCTS mCTS)
+    private void UpdateMCTS()
     {
-        if (mCTS.InProgress)
+        if (MCTSDecisionMaking.InProgress)
         {
-            var action = mCTS.ChooseAction();
+            var action = MCTSDecisionMaking.ChooseAction();
             if (action != null)
             {
                 this.CurrentAction = action;
@@ -576,39 +579,39 @@ public class AutonomousCharacter : NPC
             }
         }
         //Statistical and Debug Data
-        this.TotalProcessingTimeText.text = "Process. Time: " + mCTS.TotalProcessingTime.ToString("F");
+        this.TotalProcessingTimeText.text = "Process. Time: " + MCTSDecisionMaking.TotalProcessingTime.ToString("F");
 
         this.ProcessedActionsText.text = "Iterations: "
-            + mCTS.CurrentIterations.ToString()
+            + MCTSDecisionMaking.CurrentIterations.ToString()
             + "\n Max Sel Depth: "
-            + mCTS.MaxSelectionDepthReached.ToString()
+            + MCTSDecisionMaking.MaxSelectionDepthReached.ToString()
             + "\n Max Playout Depth: "
-            + mCTS.MaxPlayoutDepthReached.ToString();
+            + MCTSDecisionMaking.MaxPlayoutDepthReached.ToString();
 
-        if (mCTS.BestFirstChild != null)
+        if (MCTSDecisionMaking.BestFirstChild != null)
         {
-            var q = mCTS.BestFirstChild.Q / mCTS.BestFirstChild.N;
+            var q = MCTSDecisionMaking.BestFirstChild.Q / MCTSDecisionMaking.BestFirstChild.N;
             this.BestDiscontentmentText.text = "Best Exp. Q value: " + q.ToString("F05");
             var actionText = "";
  
-            foreach (var node in mCTS.BestSequence)
+            foreach (var node in MCTSDecisionMaking.BestSequence)
             {
                 actionText += "\n" + node.Action.Name + " (" + node.Q + "/" + node.N + ")";
             }
             this.BestActionSequence.text = "Best Action Sequence: " + actionText;
 
             //What is the predicted state of the world?
-            var endState = mCTS.BestActionSequenceEndState; // previously BestActionSequenceWorldState
+            var endState = MCTSDecisionMaking.BestActionSequenceEndState; // previously BestActionSequenceWorldState
             var text = "";
             if (endState != null)
             {
                 text += "Predicted World State:\n";
-                text += "My Level:" + endState.GetProperty(Properties.LEVEL) + "\n";
-                text += "My HP:" + endState.GetProperty(Properties.HP) + "\n";
-                text += "My Money:" + endState.GetProperty(Properties.MONEY) + "\n";
-                text += "Time Passsed:" + endState.GetProperty(Properties.TIME) + "\n";
+                text += "My Level:" + endState.GetProperty(PropertiesName.LEVEL) + "\n";
+                text += "My HP:" + endState.GetProperty(PropertiesName.HP) + "\n";
+                text += "My Money:" + endState.GetProperty(PropertiesName.MONEY) + "\n";
+                text += "Time Passsed:" + endState.GetProperty(PropertiesName.TIME) + "\n";
                 this.BestActionText.text = text;
-                if ((int)endState.GetProperty(Properties.HP) < 0 || (float)endState.GetProperty(Properties.TIME) > 150)
+                if ((int)endState.GetProperty(PropertiesName.HP) < 0 || (float)endState.GetProperty(PropertiesName.TIME) > 150)
                 {
                     //stop here
                 }
@@ -622,7 +625,7 @@ public class AutonomousCharacter : NPC
         }
 
 
-    }*/
+    }
 
 
 

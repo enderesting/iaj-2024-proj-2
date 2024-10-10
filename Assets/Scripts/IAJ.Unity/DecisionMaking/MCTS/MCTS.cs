@@ -76,67 +76,156 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             float reward;
 
             var startTime = Time.realtimeSinceStartup;
+            FrameCurrentIterations = 0;
 
-            //while within computational budget
+            while (this.CurrentIterations < this.MaxIterations)
+            {
+                if (FrameCurrentIterations >= this.MaxIterationsPerFrame)
+                {
+                    this.TotalProcessingTime += Time.realtimeSinceStartup - startTime;
+                    return null;    
+                }
 
-            //Selection + Expansion
+                int maxSelectionDepth = 0;
+                // Selection (& Expansions)
+                selectedNode = Selection(this.InitialNode, ref maxSelectionDepth);
+                
+                if (maxSelectionDepth > this.MaxSelectionDepthReached)
+                    this.MaxSelectionDepthReached = maxSelectionDepth;
 
-            //Playout
+                // Playout
+                reward = Playout(selectedNode.State);
 
-            //Backpropagation
+                // Backpropagation
+                Backpropagate(selectedNode, reward);
+                this.CurrentIterations++;
+                this.FrameCurrentIterations++;
+            }
 
             // return best initial child
-            return null;
+            this.InProgress = false;
+            Action bestAction = BestAction(this.InitialNode);
+            this.TotalProcessingTime += Time.realtimeSinceStartup - startTime;
+            return bestAction;
         }
 
-        // Selection and Expantion
-        protected MCTSNode Selection(MCTSNode initialNode)
+        // Selection and Expansion
+        // edit: based on https://youtu.be/UXW2yZndl7U about 1:10 in
+        protected MCTSNode Selection(MCTSNode initialNode, ref int maxSelectionDepth)
         {
+            // selecting from existing tree the best node based on an equation
+            // expand: whichever best node it lands on, find an unexplored action and explore the node
             Action nextAction;
             MCTSNode currentNode = initialNode;
-            MCTSNode bestChild;
 
-            //   while(!currentNode.State.IsTerminal())
+            while (!currentNode.State.IsTerminal())
+            {
+                maxSelectionDepth++;
+                // not fully explored
+                if ((nextAction = currentNode.State.GetNextAction()) is not null)
+                {
+                    return Expand(currentNode, nextAction);
+                }
 
-            // nextAction = currentNode.State.GetNextAction();
+                currentNode = BestUCTChild(currentNode);
+            }
 
-            //Expansion
-
-            return null;
+            return currentNode;
         }
 
         protected virtual float Playout(WorldModel initialStateForPlayout)
         {
+            WorldModel currentState = initialStateForPlayout;
             Action[] executableActions;
+            float reward = 0;
+            int playoutDepth = 0;
+            while (!currentState.IsTerminal() && playoutDepth <= this.PlayoutDepthLimit)
+            {
+                WorldModel newState = currentState.GenerateChildWorldModel();
+                
+                executableActions = newState.GetExecutableActions();
+                
+                Action selectedAction = executableActions[this.RandomGenerator.Next(0, executableActions.Length)];
+                
+                selectedAction.ApplyActionEffects(newState);
+                
+                currentState = newState;
+                playoutDepth++;
+                // Debug.Log("action chosen:" + selectedAction);
+            }
 
-            //ToDo
-            return 0.0f;
+            if (playoutDepth > this.MaxPlayoutDepthReached)
+                this.MaxPlayoutDepthReached = playoutDepth;
+
+            reward = currentState.GetScore();
+            return currentState.GetScore();
         }
 
         protected virtual void Backpropagate(MCTSNode node, float reward)
         {
-            //ToDo, do not forget to later consider two advesary moves...
+            Debug.Log("reward:" + reward);
+            node.Q += reward;
+            node.N += 1;
+            MCTSNode currentNode = node;
+            while (currentNode.Parent != null){
+                currentNode.Parent.Q += reward;
+                currentNode.Parent.N += 1;
+                currentNode = currentNode.Parent;
+            }
         }
 
+        // given a parent node and action, apply the action and adds a new node to the tree
         protected MCTSNode Expand(MCTSNode parent, Action action)
         {
             WorldModel newState = parent.State.GenerateChildWorldModel();
-            //ToDo
-            return null;
+            
+            action.ApplyActionEffects(newState); //apply action to wm like this
+
+            MCTSNode newNode = new MCTSNode(newState);
+            newNode.Action = action;
+            newNode.Parent = parent;
+            parent.ChildNodes.Add(newNode);
+            return newNode;
         }
 
         protected virtual MCTSNode BestUCTChild(MCTSNode node)
         {
-            //ToDo
-            return null;
+            MCTSNode bestChild = null;
+            double bestUCT = float.MinValue;
+            double childUCT;
+            foreach (MCTSNode childNode in node.ChildNodes){
+                //calculate best UCT score
+                if (childNode.N == 0)
+                    //childUCT = float.PositiveInfinity;
+                    return childNode; // an unvisited node's UCT is +infinity
+                else
+                    childUCT = (childNode.Q/childNode.N) + C * Math.Sqrt(Math.Log(node.N)/childNode.N);
+
+                //compare with best
+                if (childUCT > bestUCT){
+                    bestChild = childNode;
+                    bestUCT = childUCT;
+                }
+            }
+            return bestChild;
         }
 
         //this method is very similar to the bestUCTChild, but it is used to return the final action of the MCTS search, and so we do not care about
         //the exploration factor
         protected MCTSNode BestChild(MCTSNode node)
         {
-            //ToDo
-            return null;
+            float bestRatio = float.MinValue;
+            MCTSNode bestNode = null;
+            foreach (MCTSNode childNode in node.ChildNodes)
+            {
+                if (childNode.Q / childNode.N > bestRatio)
+                {
+                    bestRatio = childNode.Q / childNode.N;
+                    bestNode = childNode;
+                }
+            }
+
+            return bestNode;
         }
 
 
