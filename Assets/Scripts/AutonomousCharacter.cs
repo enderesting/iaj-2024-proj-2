@@ -84,8 +84,8 @@ public class AutonomousCharacter : NPC
     public bool GetManaPotion = true;
     public bool ShieldOfFaith = true;
     public bool DivineSmite = true;
-    public bool Teleport = false;
-    public bool LayOnHands = false;
+    public bool Teleport = true;
+    public bool LayOnHands = true;
     public bool Rest = false;
 
 
@@ -237,7 +237,8 @@ public class AutonomousCharacter : NPC
         //Then we have a series of extra actions available to Sir Uthgard
         if (ShieldOfFaith) this.Actions.Add(new ShieldOfFaith(this));
         if (LevelUp) this.Actions.Add(new LevelUp(this));
-        //if (Teleport) this.Actions.Add(new Teleport(this));
+        if (Teleport) this.Actions.Add(new Teleport(this));
+        if (LayOnHands) this.Actions.Add(new LayOnHands(this));
         //if (Rest) this.Actions.Add(new Rest(this));
 
 
