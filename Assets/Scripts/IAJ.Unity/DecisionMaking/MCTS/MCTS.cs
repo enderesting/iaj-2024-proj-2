@@ -77,7 +77,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
             var startTime = Time.realtimeSinceStartup;
 
-            while ((this.MaxIterations <= 0) || this.CurrentIterations < this.MaxIterations)
+            while (this.CurrentIterations < this.MaxIterations)
             {
                 // Selection (& Expansions)
                 selectedNode = Selection(this.InitialNode);
@@ -91,6 +91,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             }
 
             // return best initial child
+            this.InProgress = false;
             return BestAction(this.InitialNode);
         }
 
@@ -102,20 +103,18 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             // expand: whichever best node it lands on, find an unexplored action and explore the node
             Action nextAction;
             MCTSNode currentNode = initialNode;
-            MCTSNode bestChild;
-            // if it isn't leaf node...
-            while (currentNode.ChildNodes.Count() > 0){
-                // recursively choose child with best UCT value until leaf node is reached
-                bestChild = BestUCTChild(currentNode);
-                currentNode = bestChild;
+
+            while (!currentNode.State.IsTerminal())
+            {
+                // not fully explored
+                if ((nextAction = currentNode.State.GetNextAction()) is not null)
+                {
+                    return Expand(currentNode, nextAction);
+                }
+
+                currentNode = BestUCTChild(currentNode);
             }
 
-            // otherwise, expand current node -- add new node for every available action
-            while ((nextAction = currentNode.State.GetNextAction()) is not null)
-            {
-                // expand the next action in a new node and add to the node's list
-                return Expand(currentNode, nextAction);
-            }
             return currentNode;
         }
 
@@ -125,7 +124,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             Action[] executableActions;
             float reward = 0;
             int playoutDepth = 0;
-            while (!currentState.IsTerminal() && ((this.PlayoutDepthLimit <= 0) || playoutDepth <= this.PlayoutDepthLimit))
+            while (!currentState.IsTerminal() && playoutDepth <= this.PlayoutDepthLimit)
             {
                 WorldModel newState = currentState.GenerateChildWorldModel();
                 
@@ -137,15 +136,17 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 
                 currentState = newState;
                 playoutDepth++;
-                reward += selectedAction.GetHValue(currentState);
+                // Debug.Log("action chosen:" + selectedAction);
             }
+            reward = currentState.GetScore();
             return reward;
         }
 
         protected virtual void Backpropagate(MCTSNode node, float reward)
         {
-            node.Q = reward;
-            node.N = 1;
+            Debug.Log("reward:" + reward);
+            node.Q += reward;
+            node.N += 1;
             MCTSNode currentNode = node;
             while (currentNode.Parent != null){
                 currentNode.Parent.Q += reward;
